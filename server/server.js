@@ -18,6 +18,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use('/api', require('./routes/medical.routes'));
+app.use('/api', require('./routes/booking.routes'));
+app.use('/api', require('./routes/alert.routes'));
+
 
 // Routes
 app.use('/api/auth', authRoutes);
