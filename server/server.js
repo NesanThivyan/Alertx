@@ -18,6 +18,8 @@ app.use(cookieParser());
 app.use(cors({ origin: 'http://localhost:5000', credentials: true }));
 app.use(morgan('dev'));
 app.use('/api/admin', adminRoutes);
+app.use('/api/user', require('./routes/user.routes'));
+
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -32,6 +34,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/medical', medicalRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/alerts', alertRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check route
 app.get('/', (req, res) => {
