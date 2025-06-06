@@ -1,5 +1,6 @@
 const Booking = require('../models/booking.model');
 
+// Create a new booking
 exports.createBooking = async (req, res) => {
     try {
         const booking = await Booking.create({ ...req.body, user: req.user._id });
@@ -9,9 +10,14 @@ exports.createBooking = async (req, res) => {
     }
 };
 
+// Update an existing booking for the logged-in user
 exports.updateBooking = async (req, res) => {
     try {
-        const booking = await Booking.findOneAndUpdate({ user: req.user._id }, req.body, { new: true });
+        const booking = await Booking.findOneAndUpdate(
+            { user: req.user._id },
+            req.body,
+            { new: true }
+        );
         if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
         res.status(200).json({ success: true, message: 'Booking updated', data: booking });
     } catch (error) {
@@ -19,6 +25,7 @@ exports.updateBooking = async (req, res) => {
     }
 };
 
+// Delete a booking for the logged-in user
 exports.deleteBooking = async (req, res) => {
     try {
         const booking = await Booking.findOneAndDelete({ user: req.user._id });

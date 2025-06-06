@@ -1,3 +1,5 @@
+const User = require('../models/user.model');
+
 // @desc    Get logged in user's profile
 // @route   GET /api/user/profile/:id
 // @access  Private

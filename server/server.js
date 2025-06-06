@@ -1,52 +1,53 @@
 const express = require('express');
-const cors = require('cors');
 const dotenv = require('dotenv');
-const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
-const authRoutes = require('./routes/auth.routes.js');
-const { protect } = require('./middleware/auth.middleware');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const morgan = require('morgan');
+const adminRoutes = require('./routes/admin.routes');
 
-// Load env vars
-dotenv.config({ path: './.env' });
+// Load environment variables
+dotenv.config();
 
-// Connect to database
-connectDB();
-
+// Initialize app
 const app = express();
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use('/api', require('./routes/medical.routes'));
-app.use('/api', require('./routes/booking.routes'));
-app.use('/api', require('./routes/alert.routes'));
+app.use(cors({ origin: 'http://localhost:5000', credentials: true }));
+app.use(morgan('dev'));
+app.use('/api/admin', adminRoutes);
 
+// Import routes
+const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
+const medicalRoutes = require('./routes/medical.routes');
+const bookingRoutes = require('./routes/booking.routes');
+const alertRoutes = require('./routes/alert.routes');
 
-// Routes
+// Mount routes (use unique prefixes to avoid conflicts)
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/medical', medicalRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/alerts', alertRoutes);
 
-// Simple test route
+// Health check route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Example of a protected route (only accessible to logged-in users)
-app.get('/api/dashboard', protect, (req, res) => {
-  res.status(200).json({ success: true, message: `Welcome to your dashboard, ${req.user.name}! Your role is: ${req.user.role}` });
-});
-
-// Example of a hospital-only route
-// Uncomment and implement 'authorize' middleware if needed
-const { authorize } = require('./middleware/authorize');
-app.get('/api/hospital/data', protect, authorize('hospital', 'admin'), (req, res) => {
-  res.status(200).json({ success: true, message: `Accessing hospital-specific data as a ${req.user.role}.` });
-});
-
-// Example of a driver-only route
-app.get('/api/driver/route', protect, authorize('driver', 'admin'), (req, res) => {
-  res.status(200).json({ success: true, message: `Accessing driver route information as a ${req.user.role}.` });
-});
-
+// Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
+
+mongoose
+  .connect('mongodb+srv://srithivyanesan2002:0Oc4RauGqE8L3Ffc@cluster0.rufe3mm.mongodb.net/alert-x')
+  .then(() => {
+    console.log('MongoDB connected');
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error('DB connection error:', err.message);
+    process.exit(1);
+  });

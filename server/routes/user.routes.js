@@ -6,9 +6,9 @@ const {
     updateProfile,
     deleteAccount
 } = require('../controllers/user.controller');
-const { protect } = require('../middleware/auth');
+const { protect } = require('../middleware/auth.middleware');
 
-router.post('/auth/logout', protect, logout);
+
 router.get('/user/profile/:id', protect, getProfile);
 router.put('/user/profile/:id', protect, updateProfile);
 router.delete('/user/delete/:id', protect, deleteAccount);

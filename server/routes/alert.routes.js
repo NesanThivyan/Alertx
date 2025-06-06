@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { protect } = require('../middleware/auth');
+const { protect } = require('../middleware/auth.middleware');
 const {
     createAlert, getAlerts, getAlertById, updateAlertStatus
 } = require('../controllers/alert.controller');

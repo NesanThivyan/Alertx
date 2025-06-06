@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { protect } = require('../middleware/auth');
+const { protect } = require('../middleware/auth.middleware');
 const { createBooking, updateBooking, deleteBooking } = require('../controllers/booking.controller');
 
 router.post('/user/booking', protect, createBooking);

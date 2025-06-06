@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { protect } = require('../middleware/auth');
+const { protect } = require('../middleware/auth.middleware');
 const { createMedical, updateMedical } = require('../controllers/medical.controller');
 
 router.post('/user/medi', protect, createMedical);
