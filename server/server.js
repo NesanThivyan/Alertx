@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
-const adminRoutes = require('./routes/admin.routes');
+
 
 // Load environment variables
 dotenv.config();
@@ -17,9 +17,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: 'http://localhost:5000', credentials: true }));
 app.use(morgan('dev'));
-app.use('/api/admin', adminRoutes);
-app.use('/api/user', require('./routes/user.routes'));
-
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -27,6 +24,8 @@ const userRoutes = require('./routes/user.routes');
 const medicalRoutes = require('./routes/medical.routes');
 const bookingRoutes = require('./routes/booking.routes');
 const alertRoutes = require('./routes/alert.routes');
+const adminRoutes = require('./routes/admin.routes');
+
 
 // Mount routes (use unique prefixes to avoid conflicts)
 app.use('/api/auth', authRoutes);
@@ -35,6 +34,7 @@ app.use('/api/medical', medicalRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/admin', adminRoutes);
+
 
 // Health check route
 app.get('/', (req, res) => {

@@ -1,8 +1,7 @@
 const User = require('../models/user.model');
+const Caretaker = require('../models/caretaker.model');
 
 // @desc    Get all users
-// @route   GET /api/admin/users
-// @access  Admin
 exports.getAllUsers = async (req, res) => {
     try {
         const users = await User.find().select('-password');
@@ -13,8 +12,6 @@ exports.getAllUsers = async (req, res) => {
 };
 
 // @desc    Delete a user by ID
-// @route   DELETE /api/admin/user/:id
-// @access  Admin
 exports.deleteUser = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
@@ -28,8 +25,6 @@ exports.deleteUser = async (req, res) => {
 };
 
 // @desc    Update a user's role
-// @route   PUT /api/admin/user/:id/role
-// @access  Admin
 exports.updateUserRole = async (req, res) => {
     try {
         const { role } = req.body;
@@ -72,7 +67,11 @@ exports.addCaretaker = async (req, res) => {
 // @desc    Update a caretaker
 exports.updateCaretaker = async (req, res) => {
     try {
-        const caretaker = await Caretaker.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const caretaker = await Caretaker.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true }
+        );
         if (!caretaker) {
             return res.status(404).json({ success: false, message: 'Caretaker not found' });
         }
