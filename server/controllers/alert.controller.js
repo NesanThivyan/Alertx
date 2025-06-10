@@ -12,12 +12,14 @@ exports.createAlert = async (req, res) => {
 
 // Get all alerts (Admin only)
 exports.getAlerts = async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Unauthorized access' });
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Unauthorized access' });
+        }
         const alerts = await Alert.find().populate('user');
         res.status(200).json({ success: true, data: alerts });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 };
 
@@ -25,24 +27,29 @@ exports.getAlerts = async (req, res) => {
 exports.getAlertById = async (req, res) => {
     try {
         const alert = await Alert.findById(req.params.id);
-        if (!alert) return res.status(404).json({ success: false, message: 'Alert not found' });
+        if (!alert) {
+            return res.status(404).json({ success: false, message: 'Alert not found' });
+        }
         res.status(200).json({ success: true, data: alert });
     } catch (error) {
-        res.status(400).json({ success: false, message: 'Invalid alert ID' });
+        res.status(400).json({ success: false, message: 'Invalid alert ID', error: error.message });
     }
 };
 
 // Update alert status
 exports.updateAlertStatus = async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Unauthorized access' });
-    const { status } = req.body;
-    if (!['active', 'resolved'].includes(status)) {
-        return res.status(422).json({ success: false, message: 'Invalid status value' });
-    }
-
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Unauthorized access' });
+        }
+        const { status } = req.body;
+        if (!['active', 'resolved'].includes(status)) {
+            return res.status(422).json({ success: false, message: 'Invalid status value' });
+        }
         const alert = await Alert.findByIdAndUpdate(req.params.id, { status }, { new: true });
-        if (!alert) return res.status(404).json({ success: false, message: 'Alert not found' });
+        if (!alert) {
+            return res.status(404).json({ success: false, message: 'Alert not found' });
+        }
         res.status(200).json({ success: true, message: 'Status updated', data: alert });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error', error: error.message });

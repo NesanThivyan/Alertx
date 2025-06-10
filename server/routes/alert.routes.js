@@ -4,10 +4,10 @@ const {
     createAlert, getAlerts, getAlertById, updateAlertStatus
 } = require('../controllers/alert.controller');
 
-router.post('/alerts/create', protect, createAlert);
-router.get('/alerts', protect, getAlerts);
-router.get('/alerts/:id', protect, getAlertById);
-router.put('/alerts/:id/status', protect, updateAlertStatus);
+// Remove '/alerts' from the start of each path!
+router.post('/create', protect, createAlert);
+router.get('/', protect, getAlerts);
+router.get('/:id', protect, getAlertById);
+router.put('/:id/status', protect, updateAlertStatus);
 
 module.exports = router;
-
