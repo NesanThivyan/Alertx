@@ -29,7 +29,7 @@ const adminRoutes = require('./routes/admin.routes');
 
 // Mount routes (use unique prefixes to avoid conflicts)
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/medical', medicalRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/alerts', alertRoutes);

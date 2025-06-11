@@ -26,7 +26,7 @@ exports.updateBooking = async (req, res) => {
     try {
         const { id } = req.params;
         const booking = await Booking.findOneAndUpdate(
-            { _id: id, user: req.user._id }, // ensure user owns the booking
+            { _id: id, user: req.user._id },
             req.body,
             { new: true, runValidators: true }
         );

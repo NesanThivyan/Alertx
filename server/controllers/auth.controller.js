@@ -81,7 +81,7 @@ const sendTokenResponse = (user, statusCode, res) => {
     const token = user.getSignedJwtToken();
 
     const options = {
-        expires: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+        expires: new Date(Date.now() + 60 * 60 * 20000), // 20 hours
         httpOnly: true
     };
 
