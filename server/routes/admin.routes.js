@@ -9,12 +9,12 @@ const {
     updateCaretaker,
     deleteCaretaker
 } = require('../controllers/admin.controller');
-const { protect, isAdmin } = require('../middleware/auth.middleware');
+const { protect, isAdmin ,isSuperAdmin } = require('../middleware/auth.middleware');
 
 // User management
 router.get('/users', protect, isAdmin, getAllUsers);
-router.delete('/user/:id', protect, isAdmin, deleteUser);
-router.put('/user/:id/role', protect, isAdmin, updateUserRole);
+router.delete('/users/:id', protect, isSuperAdmin, deleteUser);
+router.put('/users/:id/role', protect, isSuperAdmin, updateUserRole);
 
 // Caretaker management
 router.get('/caretakers', protect, isAdmin, getAllCaretakers);

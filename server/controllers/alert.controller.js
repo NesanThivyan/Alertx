@@ -1,9 +1,22 @@
 const Alert = require('../models/alert.model');
+const User = require('../models/user.model');
 
 // Create alert
+
 exports.createAlert = async (req, res) => {
     try {
-        const alert = await Alert.create({ ...req.body, user: req.user._id });
+        // Fetch user details
+        const user = await User.findById(req.user._id);
+
+        // Create alert with user details attached
+        const alert = await Alert.create({
+            ...req.body,
+            user: req.user._id,
+            userName: user.name,
+            userEmail: user.email,
+            userPhone: user.phone
+        });
+
         res.status(201).json({ success: true, message: 'Alert sent', data: alert });
     } catch (error) {
         res.status(422).json({ success: false, message: 'Missing required data', error: error.message });

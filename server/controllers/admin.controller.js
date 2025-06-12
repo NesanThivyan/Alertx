@@ -67,6 +67,11 @@ exports.addCaretaker = async (req, res) => {
 // @desc    Update a caretaker
 exports.updateCaretaker = async (req, res) => {
     try {
+        // Optional: Validate status if present in the request
+        if (req.body.status && !['active', 'inactive'].includes(req.body.status)) {
+            return res.status(422).json({ success: false, message: 'Invalid status value' });
+        }
+
         const caretaker = await Caretaker.findByIdAndUpdate(
             req.params.id,
             req.body,

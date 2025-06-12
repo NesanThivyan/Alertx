@@ -25,6 +25,7 @@ const medicalRoutes = require('./routes/medical.routes');
 const bookingRoutes = require('./routes/booking.routes');
 const alertRoutes = require('./routes/alert.routes');
 const adminRoutes = require('./routes/admin.routes');
+const hospitalRoutes = require('./routes/hospital.routes');
 
 
 // Mount routes (use unique prefixes to avoid conflicts)
@@ -34,6 +35,7 @@ app.use('/api/medical', medicalRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/hospitals', hospitalRoutes);
 
 
 // Health check route

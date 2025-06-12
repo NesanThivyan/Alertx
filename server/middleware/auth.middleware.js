@@ -39,4 +39,13 @@ const isAdmin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, isAdmin };
+const isSuperAdmin = (req, res, next) => {
+  if (req.user && req.user.role === "superadmin") {
+    next();
+  } else {
+    res.status(403).json({ message: "Super admin access denied" });
+  }
+};
+
+
+module.exports = { protect, isAdmin, isSuperAdmin };
