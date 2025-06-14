@@ -26,7 +26,7 @@ const UserSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin', 'caretaker', 'superadmin'],
+        enum: ['user', 'admin', 'caretaker', 'superadmin', 'hospital'],
         default: 'user'
     },
     createdAt: {
@@ -53,7 +53,7 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 // Generate JWT token
 UserSchema.methods.getSignedJwtToken = function () {
     return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
-        expiresIn: '1h'
+        expiresIn: '1d'
     });
 };
 

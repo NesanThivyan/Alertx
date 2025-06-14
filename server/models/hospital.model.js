@@ -7,8 +7,10 @@ const hospitalSchema = new mongoose.Schema({
     email: String,
     location: {
         type: { type: String, enum: ['Point'], default: 'Point' },
-        coordinates: { type: [Number] } // [longitude, latitude]
-    }
+        coordinates: { type: [Number] }
+    },
+    // Add this field:
+    role: { type: String, enum: ['hospital', 'admin'], default: 'hospital' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Hospital', hospitalSchema);
