@@ -5,6 +5,7 @@ const hospitalSchema = new mongoose.Schema({
     address: String,
     phone: String,
     email: String,
+    password: { type: String, required: true, select: false },
     location: {
         type: { type: String, enum: ['Point'], default: 'Point' },
         coordinates: { type: [Number] }
@@ -14,3 +15,22 @@ const hospitalSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model('Hospital', hospitalSchema);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

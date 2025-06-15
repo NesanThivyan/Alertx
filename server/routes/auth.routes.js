@@ -4,9 +4,9 @@ const { register, login, getMe,logout } = require('../controllers/auth.controlle
 // const { protect } = require('../middleware/auth.middleware');
 const { protect, isAdmin , isSuperAdmin } = require('../middleware/auth.middleware'); // Correct import path and name
 const router = express.Router();
-const { hospitalSignup } = require('../controllers/hospital.controller'); // <-- add this line
 
-router.post('/signup', register , hospitalSignup); // No auth needed for signup
+
+router.post('/signup', register ); // No auth needed for signup
 router.post('/signin', login);
 router.get('/me', protect, getMe); // Protected route to get current user info
 router.post('/logout', protect, logout);
