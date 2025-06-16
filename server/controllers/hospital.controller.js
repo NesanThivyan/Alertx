@@ -150,32 +150,33 @@ exports.hospitalSignin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        
-        // Find hospital by email and include password
-const hospital = await Hospital.findOne({ email }).select('+password');
-if (!hospital) {
-    return res.status(401).json({ success: false, message: 'Invalid email or password' });
-}
+        // Find hospital by email and include password for comparison
+        const hospital = await Hospital.findOne({ email }).select('+password');
+        if (!hospital) {
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
 
-// Compare passwords
-const isMatch = await bcrypt.compare(password, hospital.password);
-if (!isMatch) {
-    return res.status(401).json({ success: false, message: 'Invalid email or password' });
-}
+        // Compare passwords
+        const isMatch = await bcrypt.compare(password, hospital.password);
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
 
-
-        // Create JWT token with hospital id and role
+        // Create JWT token with hospital id and current role
         const token = jwt.sign(
-            { id: hospital._id, role: hospital.role },
+            { id: hospital._id, role: hospital.role }, // this will reflect 'admin' if updated
             JWT_SECRET,
             { expiresIn: '1d' }
         );
+
+        // Remove password before sending data
+        const { password: _, ...hospitalData } = hospital._doc;
 
         res.status(200).json({
             success: true,
             message: 'Signin successful',
             token,
-            data: hospital
+            data: hospitalData
         });
 
     } catch (error) {

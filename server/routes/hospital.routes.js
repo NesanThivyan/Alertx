@@ -8,7 +8,7 @@ const {
     deleteHospital,
     changeHospitalRole,
     hospitalSignup,
-    hospitalSignin 
+    hospitalSignin
 } = require('../controllers/hospital.controller');
 
 router.post('/', protect, isSuperAdmin, createHospital);
@@ -19,6 +19,6 @@ router.delete('/:id', protect, isSuperAdmin, deleteHospital);
 router.put('/:id/changerole', protect, isSuperAdmin, changeHospitalRole);
 
 router.post('/signup', hospitalSignup); 
-router.post('/signin', hospitalSignin); 
+router .post('/signin', hospitalSignin); // handles user and hospital signin based on `type`
 
 module.exports = router;

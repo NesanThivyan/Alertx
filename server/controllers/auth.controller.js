@@ -59,6 +59,7 @@ exports.login = async (req, res) => {
     }
 };
 
+
 // @desc    Log out user
 // @route   POST /api/auth/logout
 // @access  Private
