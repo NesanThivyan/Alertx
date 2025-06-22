@@ -1,6 +1,14 @@
-const router = require('express').Router();
-const { protect, isAdmin } = require('../middleware/auth.middleware');
-const { createBooking, updateBooking, deleteBooking, getAllBookings, getBookingById } = require('../controllers/booking.controller');
+import { Router } from 'express';
+import { protect, isAdmin } from '../middleware/auth.middleware.js';
+import {
+  createBooking,
+  updateBooking,
+  deleteBooking,
+  getAllBookings,
+  getBookingById
+} from '../controllers/booking.controller.js';
+
+const router = Router();
 
 // Create a new booking
 router.post('/', protect, createBooking);
@@ -15,4 +23,4 @@ router.delete('/:id', protect, deleteBooking);
 router.get('/', protect, isAdmin, getAllBookings);        // GET /api/bookings
 router.get('/:id', protect, isAdmin, getBookingById);     // GET /api/bookings/:id
 
-module.exports = router;
+export default router;

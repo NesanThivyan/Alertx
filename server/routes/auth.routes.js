@@ -1,6 +1,7 @@
-const express = require('express');
-const { register, getMe, logout, login } = require('../controllers/auth.controller');
-const { protect, isAdmin, isSuperAdmin } = require('../middleware/auth.middleware');
+import express from 'express';
+import { register, getMe, logout, login } from '../controllers/auth.controller.js';
+import { protect, isAdmin, isSuperAdmin } from '../middleware/auth.middleware.js';
+
 const router = express.Router();
 
 router.post('/signup', register);
@@ -16,4 +17,4 @@ router.get('/superadmin-only', protect, isSuperAdmin, (req, res) => {
   res.json({ message: "This is a superadmin-only route." });
 });
 
-module.exports = router;
+export default router;

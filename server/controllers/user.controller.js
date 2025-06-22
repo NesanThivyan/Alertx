@@ -1,9 +1,9 @@
-const User = require('../models/user.model');
+import User from '../models/user.model.js';
 
-// @desc    Get logged in user's profile
-// @route   GET /api/user/profile/:id
+// @desc    Get logged-in user's profile
+// @route   GET /api/users/:id
 // @access  Private
-exports.getProfile = async (req, res) => {
+export const getProfile = async (req, res) => {
     const { id } = req.params;
 
     if (!req.user) {
@@ -27,9 +27,9 @@ exports.getProfile = async (req, res) => {
 };
 
 // @desc    Update user profile
-// @route   PUT /api/user/profile/:id
+// @route   PUT /api/users/:id
 // @access  Private
-exports.updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
     const { id } = req.params;
 
     if (req.user._id.toString() !== id && req.user.role !== 'admin') {
@@ -54,9 +54,9 @@ exports.updateProfile = async (req, res) => {
 };
 
 // @desc    Delete user account
-// @route   DELETE /api/user/delete/:id
+// @route   DELETE /api/users/:id
 // @access  Private
-exports.deleteAccount = async (req, res) => {
+export const deleteAccount = async (req, res) => {
     const { id } = req.params;
 
     if (!req.user) {

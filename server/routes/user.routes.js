@@ -1,16 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const {
-    getProfile,
-    updateProfile,
-    deleteAccount
-} = require('../controllers/user.controller');
-const { protect } = require('../middleware/auth.middleware');
+import express from 'express';
+import {
+  getProfile,
+  updateProfile,
+  deleteAccount
+} from '../controllers/user.controller.js';
+import { protect } from '../middleware/auth.middleware.js';
 
-// Remove the extra 'users' from the path
+const router = express.Router();
+
 router.get('/profile/:id', protect, getProfile);
 router.put('/profile/:id', protect, updateProfile);
 router.delete('/delete/:id', protect, deleteAccount);
 
-module.exports = router;
-// filepath: /home/nesanthivyan/Alertx/server/routes/user.routes.js
+export default router;

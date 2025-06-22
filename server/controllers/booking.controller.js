@@ -1,12 +1,17 @@
-const Booking = require('../models/booking.model');
+// bookingController.js
 
-// Create a new booking
-exports.createBooking = async (req, res) => {
+import Booking from '../models/booking.model.js';
+
+// @desc    Create a new booking
+// @route   POST /api/bookings
+// @access  Private
+export const createBooking = async (req, res) => {
     try {
         const booking = await Booking.create({ 
             ...req.body, 
             user: req.user._id 
         });
+
         return res.status(201).json({ 
             success: true, 
             message: 'Booking created successfully.', 
@@ -21,8 +26,10 @@ exports.createBooking = async (req, res) => {
     }
 };
 
-// Update an existing booking by ID for the logged-in user
-exports.updateBooking = async (req, res) => {
+// @desc    Update booking by ID
+// @route   PUT /api/bookings/:id
+// @access  Private
+export const updateBooking = async (req, res) => {
     try {
         const { id } = req.params;
         const booking = await Booking.findOneAndUpdate(
@@ -52,8 +59,10 @@ exports.updateBooking = async (req, res) => {
     }
 };
 
-// Delete a booking by ID for the logged-in user
-exports.deleteBooking = async (req, res) => {
+// @desc    Delete booking by ID
+// @route   DELETE /api/bookings/:id
+// @access  Private
+export const deleteBooking = async (req, res) => {
     try {
         const { id } = req.params;
         const booking = await Booking.findOneAndDelete({ 
@@ -81,8 +90,10 @@ exports.deleteBooking = async (req, res) => {
     }
 };
 
-// Get all bookings (admin only)
-exports.getAllBookings = async (req, res) => {
+// @desc    Get all bookings (admin only)
+// @route   GET /api/bookings
+// @access  Private/Admin
+export const getAllBookings = async (req, res) => {
     try {
         const bookings = await Booking.find().populate('user', 'name email');
         return res.status(200).json({ success: true, data: bookings });
@@ -95,8 +106,10 @@ exports.getAllBookings = async (req, res) => {
     }
 };
 
-// Get a single booking by ID (admin)
-exports.getBookingById = async (req, res) => {
+// @desc    Get booking by ID (admin only)
+// @route   GET /api/bookings/:id
+// @access  Private/Admin
+export const getBookingById = async (req, res) => {
     try {
         const booking = await Booking.findById(req.params.id).populate('user', 'name email');
         if (!booking) {

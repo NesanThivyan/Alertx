@@ -1,14 +1,13 @@
-const Alert = require('../models/alert.model');
-const User = require('../models/user.model');
+// alertController.js
 
-// Create alert
+import Alert from '../models/alert.model.js';
+import User from '../models/user.model.js';
 
-exports.createAlert = async (req, res) => {
+// @desc    Create alert
+export const createAlert = async (req, res) => {
     try {
-        // Fetch user details
         const user = await User.findById(req.user._id);
 
-        // Create alert with user details attached
         const alert = await Alert.create({
             ...req.body,
             user: req.user._id,
@@ -23,12 +22,13 @@ exports.createAlert = async (req, res) => {
     }
 };
 
-// Get all alerts (Admin only)
-exports.getAlerts = async (req, res) => {
+// @desc    Get all alerts (Admin only)
+export const getAlerts = async (req, res) => {
     try {
         if (req.user.role !== 'admin') {
             return res.status(403).json({ success: false, message: 'Unauthorized access' });
         }
+
         const alerts = await Alert.find().populate('user');
         res.status(200).json({ success: true, data: alerts });
     } catch (error) {
@@ -36,8 +36,8 @@ exports.getAlerts = async (req, res) => {
     }
 };
 
-// Get specific alert
-exports.getAlertById = async (req, res) => {
+// @desc    Get specific alert by ID
+export const getAlertById = async (req, res) => {
     try {
         const alert = await Alert.findById(req.params.id);
         if (!alert) {
@@ -49,20 +49,23 @@ exports.getAlertById = async (req, res) => {
     }
 };
 
-// Update alert status
-exports.updateAlertStatus = async (req, res) => {
+// @desc    Update alert status (Admin only)
+export const updateAlertStatus = async (req, res) => {
     try {
         if (req.user.role !== 'admin') {
             return res.status(403).json({ success: false, message: 'Unauthorized access' });
         }
+
         const { status } = req.body;
         if (!['active', 'resolved'].includes(status)) {
             return res.status(422).json({ success: false, message: 'Invalid status value' });
         }
+
         const alert = await Alert.findByIdAndUpdate(req.params.id, { status }, { new: true });
         if (!alert) {
             return res.status(404).json({ success: false, message: 'Alert not found' });
         }
+
         res.status(200).json({ success: true, message: 'Status updated', data: alert });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error', error: error.message });

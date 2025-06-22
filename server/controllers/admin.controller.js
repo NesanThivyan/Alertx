@@ -1,8 +1,12 @@
-const User = require('../models/user.model');
-const Caretaker = require('../models/caretaker.model');
+// userController.js
+
+import User from '../models/user.model.js';
+import Caretaker from '../models/caretaker.model.js';
+
+// --- User Management ---
 
 // @desc    Get all users
-exports.getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find().select('-password');
         res.status(200).json({ success: true, data: users });
@@ -12,7 +16,7 @@ exports.getAllUsers = async (req, res) => {
 };
 
 // @desc    Delete a user by ID
-exports.deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) {
@@ -25,7 +29,7 @@ exports.deleteUser = async (req, res) => {
 };
 
 // @desc    Update a user's role
-exports.updateUserRole = async (req, res) => {
+export const updateUserRole = async (req, res) => {
     try {
         const { role } = req.body;
         const user = await User.findByIdAndUpdate(
@@ -45,7 +49,7 @@ exports.updateUserRole = async (req, res) => {
 // --- Caretaker Management ---
 
 // @desc    Get all caretakers
-exports.getAllCaretakers = async (req, res) => {
+export const getAllCaretakers = async (req, res) => {
     try {
         const caretakers = await Caretaker.find();
         res.status(200).json({ success: true, data: caretakers });
@@ -55,7 +59,7 @@ exports.getAllCaretakers = async (req, res) => {
 };
 
 // @desc    Add a caretaker
-exports.addCaretaker = async (req, res) => {
+export const addCaretaker = async (req, res) => {
     try {
         const caretaker = await Caretaker.create(req.body);
         res.status(201).json({ success: true, message: 'Caretaker added', data: caretaker });
@@ -65,10 +69,9 @@ exports.addCaretaker = async (req, res) => {
 };
 
 // @desc    Update a caretaker
-exports.updateCaretaker = async (req, res) => {
+export const updateCaretaker = async (req, res) => {
     try {
-        // Optional: Validate status if present in the request
-        if (req.body.status && !['active', 'inactive'].includes(req.body.status)) {
+        if (req.body?.status && !['active', 'inactive'].includes(req.body.status)) {
             return res.status(422).json({ success: false, message: 'Invalid status value' });
         }
 
@@ -77,17 +80,20 @@ exports.updateCaretaker = async (req, res) => {
             req.body,
             { new: true, runValidators: true }
         );
+
         if (!caretaker) {
             return res.status(404).json({ success: false, message: 'Caretaker not found' });
         }
+
         res.status(200).json({ success: true, message: 'Caretaker updated', data: caretaker });
     } catch (error) {
+        console.error(error);
         res.status(422).json({ success: false, message: 'Validation failed', error: error.message });
     }
 };
 
 // @desc    Delete a caretaker
-exports.deleteCaretaker = async (req, res) => {
+export const deleteCaretaker = async (req, res) => {
     try {
         const caretaker = await Caretaker.findByIdAndDelete(req.params.id);
         if (!caretaker) {

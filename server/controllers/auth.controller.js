@@ -1,10 +1,10 @@
-const User = require('../models/user.model');
-const jwt = require('jsonwebtoken');
+import User from '../models/user.model.js';
+import jwt from 'jsonwebtoken';
 
 // @desc    Register user
 // @route   POST /api/auth/signup
 // @access  Public
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
 
@@ -17,15 +17,9 @@ exports.register = async (req, res) => {
             return res.status(400).json({ success: false, message: 'User with this email already exists.' });
         }
 
-        const user = await User.create({
-            name,
-            email,
-            password,
-            role // will default to 'user' if not provided
-        });
+        const user = await User.create({ name, email, password, role });
 
         sendTokenResponse(user, 201, res);
-
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server Error during registration', error: error.message });
     }
@@ -34,7 +28,7 @@ exports.register = async (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/signin
 // @access  Public
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -53,17 +47,15 @@ exports.login = async (req, res) => {
         }
 
         sendTokenResponse(user, 200, res);
-
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server Error during login', error: error.message });
     }
 };
 
-
-// @desc    Log out user
+// @desc    Logout user
 // @route   POST /api/auth/logout
 // @access  Private
-exports.logout = (req, res) => {
+export const logout = (req, res) => {
     if (!req.cookies.token) {
         return res.status(401).json({ success: false, message: 'Not logged in' });
     }
@@ -76,13 +68,31 @@ exports.logout = (req, res) => {
     res.status(200).json({ success: true, message: 'Logged out successfully' });
 };
 
+// @desc    Get current logged-in user
+// @route   GET /api/auth/me
+// @access  Private
+export const getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
 
-// Helper to send JWT token in response
+        res.status(200).json({
+            success: true,
+            data: user
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server Error getting user data', error: error.message });
+    }
+};
+
+// @desc    Send JWT token in cookie + response
 const sendTokenResponse = (user, statusCode, res) => {
     const token = user.getSignedJwtToken();
 
     const options = {
-        expires: new Date(Date.now() + 60 * 60 * 20000), // 20 hours
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
         httpOnly: true
     };
 
@@ -100,22 +110,4 @@ const sendTokenResponse = (user, statusCode, res) => {
                 role: user.role
             }
         });
-};
-
-// @desc    Get current logged in user
-// @route   GET /api/auth/me
-// @access  Private
-exports.getMe = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id);
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
-        res.status(200).json({
-            success: true,
-            data: user
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server Error getting user data', error: error.message });
-    }
 };

@@ -1,7 +1,13 @@
-const Hospital = require('../models/hospital.model');
+import Hospital from '../models/hospital.model.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
-// Create hospital
-exports.createHospital = async (req, res) => {
+const JWT_SECRET = process.env.JWT_SECRET || 'your_secret';
+
+// @desc    Create a new hospital
+// @route   POST /api/hospitals
+// @access  Admin
+export const createHospital = async (req, res) => {
     try {
         const hospital = await Hospital.create(req.body);
         res.status(201).json({ success: true, data: hospital });
@@ -10,8 +16,10 @@ exports.createHospital = async (req, res) => {
     }
 };
 
-// Get all hospitals
-exports.getHospitals = async (req, res) => {
+// @desc    Get all hospitals
+// @route   GET /api/hospitals
+// @access  Public
+export const getHospitals = async (req, res) => {
     try {
         const hospitals = await Hospital.find();
         res.status(200).json({ success: true, data: hospitals });
@@ -20,8 +28,10 @@ exports.getHospitals = async (req, res) => {
     }
 };
 
-// Get single hospital
-exports.getHospitalById = async (req, res) => {
+// @desc    Get single hospital
+// @route   GET /api/hospitals/:id
+// @access  Public
+export const getHospitalById = async (req, res) => {
     try {
         const hospital = await Hospital.findById(req.params.id);
         if (!hospital) {
@@ -33,21 +43,30 @@ exports.getHospitalById = async (req, res) => {
     }
 };
 
-// Update hospital
-exports.updateHospital = async (req, res) => {
+// @desc    Update hospital
+// @route   PUT /api/hospitals/:id
+// @access  Admin
+export const updateHospital = async (req, res) => {
     try {
-        const hospital = await Hospital.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const hospital = await Hospital.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+
         if (!hospital) {
             return res.status(404).json({ success: false, message: 'Hospital not found' });
         }
+
         res.status(200).json({ success: true, message: 'Hospital updated', data: hospital });
     } catch (error) {
         res.status(422).json({ success: false, message: 'Validation failed', error: error.message });
     }
 };
 
-// Delete hospital
-exports.deleteHospital = async (req, res) => {
+// @desc    Delete hospital
+// @route   DELETE /api/hospitals/:id
+// @access  Admin
+export const deleteHospital = async (req, res) => {
     try {
         const hospital = await Hospital.findByIdAndDelete(req.params.id);
         if (!hospital) {
@@ -59,24 +78,17 @@ exports.deleteHospital = async (req, res) => {
     }
 };
 
-
-
-
-
-
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'your_secret';
-
-exports.changeHospitalRole = async (req, res) => {
+// @desc    Change hospital role
+// @route   PUT /api/hospitals/:id/role
+// @access  Admin
+export const changeHospitalRole = async (req, res) => {
     try {
         const { role } = req.body;
 
-        // Check valid role
         if (!['hospital', 'admin'].includes(role)) {
             return res.status(422).json({ success: false, message: 'Invalid role value' });
         }
 
-        // Update hospital
         const hospital = await Hospital.findByIdAndUpdate(
             req.params.id,
             { role },
@@ -87,12 +99,7 @@ exports.changeHospitalRole = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Hospital not found' });
         }
 
-        // Sign a new JWT with updated role
-        const token = jwt.sign(
-            { id: hospital._id, role: hospital.role },
-            JWT_SECRET,
-            { expiresIn: '1d' }
-        );
+        const token = jwt.sign({ id: hospital._id, role: hospital.role }, JWT_SECRET, { expiresIn: '1d' });
 
         res.status(200).json({
             success: true,
@@ -102,19 +109,14 @@ exports.changeHospitalRole = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 };
 
-const bcrypt = require('bcryptjs');
-
-
-
-exports.hospitalSignup = async (req, res) => {
+// @desc    Hospital signup
+// @route   POST /api/hospitals/signup
+// @access  Public
+export const hospitalSignup = async (req, res) => {
     try {
         const { name, address, phone, email, password, location } = req.body;
 
@@ -130,11 +132,7 @@ exports.hospitalSignup = async (req, res) => {
             role: 'hospital'
         });
 
-        const token = jwt.sign(
-            { id: hospital._id, role: hospital.role },
-            JWT_SECRET,
-            { expiresIn: '1d' }
-        );
+        const token = jwt.sign({ id: hospital._id, role: hospital.role }, JWT_SECRET, { expiresIn: '1d' });
 
         res.status(201).json({ success: true, token, data: hospital });
     } catch (error) {
@@ -142,34 +140,31 @@ exports.hospitalSignup = async (req, res) => {
     }
 };
 
-
-
-
-
-exports.hospitalSignin = async (req, res) => {
+// @desc    Hospital signin
+// @route   POST /api/hospitals/signin
+// @access  Public
+export const hospitalSignin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find hospital by email and include password for comparison
         const hospital = await Hospital.findOne({ email }).select('+password');
         if (!hospital) {
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
 
-        // Compare passwords
         const isMatch = await bcrypt.compare(password, hospital.password);
         if (!isMatch) {
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
 
-        // Create JWT token with hospital id and current role
-        const token = jwt.sign(
-            { id: hospital._id, role: hospital.role }, // this will reflect 'admin' if updated
-            JWT_SECRET,
-            { expiresIn: '1d' }
-        );
+        if (!process.env.JWT_SECRET) {
+            throw new Error('JWT_SECRET is missing from environment variables');
+        }
 
-        // Remove password before sending data
+        const token = jwt.sign({ id: hospital._id, role: hospital.role }, process.env.JWT_SECRET, {
+            expiresIn: '7d'
+        });
+
         const { password: _, ...hospitalData } = hospital._doc;
 
         res.status(200).json({
@@ -180,6 +175,7 @@ exports.hospitalSignin = async (req, res) => {
         });
 
     } catch (error) {
+        console.error("Signin error:", error);
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 };

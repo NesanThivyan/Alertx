@@ -1,15 +1,17 @@
-const router = require('express').Router();
-const { protect, isSuperAdmin } = require('../middleware/auth.middleware');
-const {
-    createHospital,
-    getHospitals,
-    getHospitalById,
-    updateHospital,
-    deleteHospital,
-    changeHospitalRole,
-    hospitalSignup,
-    hospitalSignin
-} = require('../controllers/hospital.controller');
+import { Router } from 'express';
+import { protect, isSuperAdmin } from '../middleware/auth.middleware.js';
+import {
+  createHospital,
+  getHospitals,
+  getHospitalById,
+  updateHospital,
+  deleteHospital,
+  changeHospitalRole,
+  hospitalSignup,
+  hospitalSignin
+} from '../controllers/hospital.controller.js';
+
+const router = Router();
 
 router.post('/', protect, isSuperAdmin, createHospital);
 router.get('/', protect, isSuperAdmin, getHospitals);
@@ -18,7 +20,7 @@ router.put('/:id', protect, isSuperAdmin, updateHospital);
 router.delete('/:id', protect, isSuperAdmin, deleteHospital);
 router.put('/:id/changerole', protect, isSuperAdmin, changeHospitalRole);
 
-router.post('/signup', hospitalSignup); 
-router .post('/signin', hospitalSignin); // handles user and hospital signin based on `type`
+router.post('/signup', hospitalSignup);
+router.post('/signin', hospitalSignin); // handles user and hospital signin based on `type`
 
-module.exports = router;
+export default router;

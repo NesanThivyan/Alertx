@@ -1,10 +1,10 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const morgan = require('morgan');
-
+import express from 'express';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import morgan from 'morgan';
+import bodyParser from 'body-parser'
 
 // Load environment variables
 dotenv.config();
@@ -15,28 +15,28 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: 'http://localhost:5000', credentials: true }));
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(morgan('dev'));
-
-// Import routes
-const authRoutes = require('./routes/auth.routes');
-const userRoutes = require('./routes/user.routes');
-const medicalRoutes = require('./routes/medical.routes');
-const bookingRoutes = require('./routes/booking.routes');
-const alertRoutes = require('./routes/alert.routes');
-const adminRoutes = require('./routes/admin.routes');
-const hospitalRoutes = require('./routes/hospital.routes');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
-// Mount routes (use unique prefixes to avoid conflicts)
+
+// Import routes (add `.js` if running with native ES modules)
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import bookingRoutes from './routes/booking.routes.js';
+import alertRoutes from './routes/alert.routes.js';
+import adminRoutes from './routes/admin.routes.js';
+import hospitalRoutes from './routes/hospital.routes.js';
+
+// Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/medical', medicalRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/hospitals', hospitalRoutes);
-
 
 // Health check route
 app.get('/', (req, res) => {
@@ -46,8 +46,7 @@ app.get('/', (req, res) => {
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect('mongodb+srv://srithivyanesan2002:0Oc4RauGqE8L3Ffc@cluster0.rufe3mm.mongodb.net/alert-x')
-
+mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://srithivyanesan2002:0Oc4RauGqE8L3Ffc@cluster0.rufe3mm.mongodb.net/alert-x')
   .then(() => {
     console.log('MongoDB connected');
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
