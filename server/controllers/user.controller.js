@@ -1,81 +1,130 @@
-import User from '../models/user.model.js';
+import User from "../models/user.model.js";
 
-// @desc    Get logged-in user's profile
-// @route   GET /api/users/:id
-// @access  Private
+/* ---------- Profile & Account ---------- */
+
+// GET /api/users/:id
 export const getProfile = async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    if (!req.user) {
-        return res.status(401).json({ success: false, message: 'User not authenticated' });
-    }
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: "Not authenticated" });
+  }
 
-    if (req.user._id.toString() !== id && req.user.role !== 'admin') {
-        return res.status(403).json({ success: false, message: 'Unauthorized access' });
-    }
+  if (req.user._id.toString() !== id && req.user.role !== "admin") {
+    return res.status(403).json({ success: false, message: "Unauthorized" });
+  }
 
-    try {
-        const user = await User.findById(id).select('-password');
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
+  try {
+    const user = await User.findById(id).select("-password");
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-        res.status(200).json({ success: true, data: user });
-    } catch (error) {
-        res.status(400).json({ success: false, message: 'Invalid user ID' });
-    }
+    res.status(200).json({ success: true, data: user });
+  } catch {
+    res.status(400).json({ success: false, message: "Invalid user ID" });
+  }
 };
 
-// @desc    Update user profile
-// @route   PUT /api/users/:id
-// @access  Private
+// PUT /api/users/:id
 export const updateProfile = async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    if (req.user._id.toString() !== id && req.user.role !== 'admin') {
-        return res.status(403).json({ success: false, message: 'Unauthorized access' });
-    }
+  if (req.user._id.toString() !== id && req.user.role !== "admin") {
+    return res.status(403).json({ success: false, message: "Unauthorized" });
+  }
 
-    try {
-        const updates = req.body;
-        const user = await User.findByIdAndUpdate(id, updates, {
-            new: true,
-            runValidators: true
-        });
+  try {
+    const user = await User.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
-
-        res.status(200).json({ success: true, message: 'Profile updated', data: user });
-    } catch (error) {
-        res.status(422).json({ success: false, message: 'Validation failed', error: error.message });
-    }
+    res.status(200).json({ success: true, message: "Profile updated", data: user });
+  } catch (err) {
+    res.status(422).json({ success: false, message: err.message });
+  }
 };
 
-// @desc    Delete user account
-// @route   DELETE /api/users/:id
-// @access  Private
+// DELETE /api/users/:id
 export const deleteAccount = async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    if (!req.user) {
-        return res.status(401).json({ success: false, message: 'User not authenticated' });
-    }
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: "Not authenticated" });
+  }
+  if (req.user._id.toString() !== id && req.user.role !== "admin") {
+    return res.status(403).json({ success: false, message: "Unauthorized" });
+  }
 
-    if (req.user._id.toString() !== id && req.user.role !== 'admin') {
-        return res.status(403).json({ success: false, message: 'Unauthorized access' });
-    }
+  try {
+    const user = await User.findByIdAndDelete(id);
+    if (!user) return res.status(404).json({ success: false, message: "Account not found" });
 
-    try {
-        const user = await User.findByIdAndDelete(id);
+    res.status(200).json({ success: true, message: "User deleted" });
+  } catch {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'Account not found' });
-        }
+/* ---------- Embedded ‘details’ field on User ---------- */
 
-        res.status(200).json({ success: true, message: 'User deleted' });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error', error: error.message });
-    }
+// GET /api/users/:id/details
+export const getUserDetails = async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user._id.toString() !== id && req.user.role !== "admin") {
+    return res.status(403).json({ success: false, message: "Unauthorized" });
+  }
+
+  try {
+    const user = await User.findById(id).select("details");
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    res.status(200).json({ success: true, data: user.details });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+// PUT /api/users/:id/details  (update details)
+export const updateUserDetails = async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user._id.toString() !== id && req.user.role !== "admin") {
+    return res.status(403).json({ success: false, message: "Unauthorized" });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { details: req.body },
+      { new: true, runValidators: true }
+    );
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    res.status(200).json({ success: true, data: user.details });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+// POST /api/users/:id/details  (create or overwrite details)
+export const createOrUpdateUserDetails = async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user._id.toString() !== id && req.user.role !== "admin") {
+    return res.status(403).json({ success: false, message: "Unauthorized" });
+  }
+
+  try {
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    user.details = req.body;
+    await user.save();
+
+    res.status(201).json({ success: true, data: user.details });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
 };

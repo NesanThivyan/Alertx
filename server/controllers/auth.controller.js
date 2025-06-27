@@ -7,24 +7,20 @@ import jwt from 'jsonwebtoken';
 export const register = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
-
         if (!name || !email || !password) {
             return res.status(400).json({ success: false, message: 'Please enter all fields.' });
         }
-
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ success: false, message: 'User with this email already exists.' });
         }
-
         const user = await User.create({ name, email, password, role });
-
         sendTokenResponse(user, 201, res);
     } catch (error) {
+        console.error('Signup error:', error); // <--- Add this line
         res.status(500).json({ success: false, message: 'Server Error during registration', error: error.message });
     }
 };
-
 // @desc    Login user
 // @route   POST /api/auth/signin
 // @access  Public

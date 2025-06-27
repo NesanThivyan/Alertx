@@ -29,6 +29,8 @@ import bookingRoutes from './routes/booking.routes.js';
 import alertRoutes from './routes/alert.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import hospitalRoutes from './routes/hospital.routes.js';
+import feedbackRoutes from './routes/feedback.routes.js';
+import chatRoutes from './routes/chat.routes.js';
 
 // Mount routes
 app.use('/api/auth', authRoutes);
@@ -37,6 +39,8 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/hospitals', hospitalRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Health check route
 app.get('/', (req, res) => {

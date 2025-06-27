@@ -2,10 +2,33 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+const GuardianSchema = new mongoose.Schema({
+  name: { type: String, trim: true },
+  phone: { type: String, trim: true },
+  relationship: { type: String, trim: true }
+}, { _id: false });
+
+const MedicalSchema = new mongoose.Schema({
+  bloodGroup: { type: String, trim: true },
+  allergies: { type: [String], default: [] },
+  chronicDiseases: { type: [String], default: [] },
+  medications: { type: [String], default: [] }
+}, { _id: false });
+
+const UserDetailsSchema = new mongoose.Schema({
+  name: { type: String, trim: true, default: "" },
+  age: { type: Number, min: 0, max: 150 },
+  place: { type: String, trim: true, default: "" },
+  phone: { type: String, trim: true, default: "" },
+  nic: { type: String, trim: true, default: "" },
+  work: { type: String, trim: true, default: "" }
+}, { _id: false });
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Please add a name']
+    required: [true, 'Please add a name'],
+    trim: true
   },
   email: {
     type: String,
@@ -29,19 +52,25 @@ const UserSchema = new mongoose.Schema({
     enum: ['user', 'admin', 'caretaker', 'superadmin', 'hospital'],
     default: 'user'
   },
+  medical: MedicalSchema,
+  guardian: GuardianSchema,
+  details: UserDetailsSchema,
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-// Encrypt password before saving
+// Hash password before saving
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Compare entered password with hashed password
