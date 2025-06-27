@@ -31,12 +31,13 @@ import adminRoutes from './routes/admin.routes.js';
 import hospitalRoutes from './routes/hospital.routes.js';
 import feedbackRoutes from './routes/feedback.routes.js';
 import chatRoutes from './routes/chat.routes.js';
-
+import medicalRoutes from './routes/medical.routes.js';
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/alerts', alertRoutes);
+app.use('/api/medical', medicalRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/feedback', feedbackRoutes);
